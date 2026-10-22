@@ -1,0 +1,17 @@
+# Perpustakaan Sekolah - Apache config
+
+Options -Indexes
+
+# Jangan cache aset supaya desain baru langsung tampil
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js|woff2?|ttf|eot|svg|png|jpe?g|gif|ico)$">
+        Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_mime.c>
+    AddType application/javascript .js
+</IfModule>
+
+DirectoryIndex index.php

@@ -2,6 +2,7 @@
 require __DIR__ . '/config/functions.php';
 $u = auth();
 $title = 'Dashboard';
+$kicker = $u['role'] === 'pengguna' ? 'Anggota' : 'Panel ' . ucfirst($u['role']);
 $hariIni = date('Y-m-d');
 
 $one = function (string $sql, array $p = []) use ($pdo) {
@@ -20,6 +21,11 @@ if ($u['role'] === 'pengguna') {
                          WHERE p.user_id=? ORDER BY p.id DESC LIMIT 5");
     $st->execute([$u['id']]);
     $riwayat = $st->fetchAll();
+
+    $st = $pdo->prepare("SELECT MIN(tgl_jatuh_tempo) FROM peminjaman
+                         WHERE user_id=? AND status='dipinjam'");
+    $st->execute([$u['id']]);
+    $dekat = $st->fetchColumn() ?: 'Tidak ada';
 } else {
     $buku     = (int) $one("SELECT COUNT(*) FROM buku");
     $stok     = (int) $one("SELECT COALESCE(SUM(stok_tersedia),0) FROM buku");
@@ -39,11 +45,40 @@ require __DIR__ . '/includes/header.php';
 ?>
 
 <?php if ($u['role'] === 'pengguna'): ?>
-    <div class="grid grid-4">
-        <div class="card stat"><div class="label">Pinjaman Aktif</div><div class="value"><?= $aktif ?></div></div>
-        <div class="card stat"><div class="label">Terlambat</div><div class="value"><?= $telat ?></div></div>
-        <div class="card stat"><div class="label">Selesai</div><div class="value"><?= $selesai ?></div></div>
-        <div class="card stat"><div class="label">Total Denda</div><div class="value small">Rp <?= number_format($denda, 0, ',', '.') ?></div></div>
+    <section class="hero">
+        <div class="hero-text">
+            <div class="kicker">Selamat datang</div>
+            <h2>Halo, <em><?= e(explode(' ', $u['nama'])[0]) ?></em>.<br>Mau baca apa hari ini?</h2>
+            <p class="hero-sub">Katalog, pinjaman, dan riwayat kamu — semua di satu tempat.</p>
+            <a class="btn btn-primary" href="katalog.php">Cari Buku</a>
+        </div>
+        <ul class="hero-tickets">
+            <li><span>Pinjaman aktif</span><b><?= $aktif ?></b></li>
+            <li><span>Terlambat</span><b><?= $telat ?></b></li>
+            <li><span>Denda</span><b>Rp <?= number_format($denda, 0, ',', '.') ?></b></li>
+        </ul>
+    </section>
+<?php else: ?>
+    <section class="hero">
+        <div class="hero-text">
+            <div class="kicker">Ringkasan</div>
+            <h2>Ruang kerja<br><em><?= e(ucfirst($u['role'])) ?></em>.</h2>
+            <p class="hero-sub">Kondisi perpustakaan hari ini, apa pun peranmu.</p>
+            <a class="btn btn-primary" href="<?= $u['role'] === 'operator' ? 'buku.php' : ($u['role'] === 'admin' ? 'users.php' : 'sirkulasi.php') ?>">Buka Kerja Utama</a>
+        </div>
+        <ul class="hero-tickets">
+            <li><span>Menunggu</span><b><?= $menunggu ?></b></li>
+            <li><span>Dipinjam</span><b><?= $dipinjam ?></b></li>
+            <li><span>Terlambat</span><b><?= $telat ?></b></li>
+        </ul>
+    </section>
+<?php endif; ?>
+
+<?php if ($u['role'] === 'pengguna'): ?>
+    <div class="grid grid-3">
+        <div class="card stat"><div class="label">Sudah Selesai</div><div class="value"><?= $selesai ?></div></div>
+        <div class="card stat"><div class="label">Sisa Kuota Pinjam</div><div class="value"><?= max(0, 3 - $aktif) ?><span class="muted" style="font-size:16px"> / 3</span></div></div>
+        <div class="card stat"><div class="label">Jatuh Tempo Terdekat</div><div class="value small"><?= e($dekat ?? 'Tidak ada') ?></div></div>
     </div>
 
     <div class="card">

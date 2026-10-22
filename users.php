@@ -2,6 +2,7 @@
 require __DIR__ . '/config/functions.php';
 $u = auth(['admin']);
 $title = 'Kelola User';
+$kicker = 'Administrator';
 $role = ['admin', 'petugas', 'operator', 'pengguna'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

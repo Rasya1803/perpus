@@ -2,6 +2,7 @@
 require __DIR__ . '/config/functions.php';
 $u = auth(['operator', 'admin']);
 $title = 'Kelola Buku';
+$kicker = 'Operator';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();

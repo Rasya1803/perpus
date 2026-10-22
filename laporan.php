@@ -2,6 +2,7 @@
 require __DIR__ . '/config/functions.php';
 $u = auth(['admin']);
 $title = 'Laporan Peminjaman';
+$kicker = 'Administrator';
 
 $status = $_GET['status'] ?? '';
 $valid  = ['menunggu', 'dipinjam', 'dikembalikan', 'ditolak', 'dibatalkan'];

@@ -2,6 +2,7 @@
 require __DIR__ . '/config/functions.php';
 $u = auth(['petugas', 'admin']);
 $title = 'Sirkulasi';
+$kicker = 'Petugas';
 $hariIni = date('Y-m-d');
 $batas = date('Y-m-d', strtotime('+7 days'));
 

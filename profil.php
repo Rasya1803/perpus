@@ -2,6 +2,7 @@
 require __DIR__ . '/config/functions.php';
 $u = auth();
 $title = 'Profil Saya';
+$kicker = 'Akun';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
